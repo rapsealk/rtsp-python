@@ -43,9 +43,11 @@ class RTPPacket(Packet):
     MARKER = 0
     SSRC_ID = 1337  # Identifies the server
 
-    def __init__(self, payload_type, sequence_number, timestamp=time.time()):
+    def __init__(self, payload_type, sequence_number, timestamp=None):
         """ RTP header field
             TODO: https://github.com/mutaphore/RTSP-Client-Server/blob/master/RTPpacket.java#L74-L104 """
+        if timestamp is None:
+            timestamp = time.time()
         self.version            = RTPPacket.VERSION
         self.padding            = RTPPacket.PADDING
         self.extension          = RTPPacket.EXTENSION
