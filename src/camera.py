@@ -10,6 +10,10 @@ if sys.platform == "linux":
     import picamera.array
 elif sys.platform == "darwin" or sys.platform == "win32":
     import cv2
+    import numpy as np
+
+import pickle
+import zlib
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 720
@@ -51,8 +55,6 @@ class CvCamera(BaseCamera):
         cv2.destroyAllWindows()
 
     def capture(self):
-        import numpy as np
-        import pickle
         while self.camera.isOpened:
             ret, frame = self.camera.read()
             #print(frame.shape, frame.flatten().shape)
@@ -65,13 +67,12 @@ class CvCamera(BaseCamera):
             """
             yield frame
 
-    def compress(self, frame):
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-        ret, encoded = cv2.imencode(".jpg", frame, encode_param)
-        return encoded
+    def compress(self, data: bytes, level=5):
+        assert(type(data) == bytes)
+        return zlib.compress(data, level)
 
-    def decompress(self, frame):
-        return cv2.imdecode(frame, 1)
+    def decompress(self, data):
+        return zlib.decompress(data)
 
 def get_camera():
     global IMAGE_WIDTH, IMAGE_HEIGHT
