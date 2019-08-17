@@ -12,14 +12,17 @@ class RTCPServer:
     BUFFER_SIZE = 4096
 
     def __init__(self, port=19001):
+        self.camera = CameraFactory.get_camera()
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.bind(("0.0.0.0", port))
+
+    def __del__(self):
+        self.socket.close()
 
     def run(self):
         while True:
             data, addr = self.socket.recvfrom(RTCPServer.BUFFER_SIZE)
             sys.stdout.write("[RTCP from %d] %s\n" % (addr, data.decode("utf-8")))
-            
 
 
 def parse_args():

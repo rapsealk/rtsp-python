@@ -12,11 +12,14 @@ elif sys.platform == "darwin" or sys.platform == "win32":
     import cv2
     import numpy as np
 
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 import zlib
 
-IMAGE_WIDTH = 1280
-IMAGE_HEIGHT = 720
+IMAGE_WIDTH = 640
+IMAGE_HEIGHT = 480
 
 class BaseCamera(object):
 
@@ -57,7 +60,7 @@ class CvCamera(BaseCamera):
     def capture(self):
         while self.camera.isOpened:
             ret, frame = self.camera.read()
-            #print(frame.shape, frame.flatten().shape)
+            print(frame.shape)
             """
             frame = frame.flatten()
             frame = pickle.dumps(frame)
@@ -67,23 +70,23 @@ class CvCamera(BaseCamera):
             """
             yield frame
 
-    def compress(self, data: bytes, level=5):
+    def compress(self, data: bytes, level=5) -> bytes:
         assert(type(data) == bytes)
         return zlib.compress(data, level)
 
-    def decompress(self, data):
+    def decompress(self, data: bytes) -> bytes:
         return zlib.decompress(data)
 
-def get_camera():
-    global IMAGE_WIDTH, IMAGE_HEIGHT
-    if sys.platform == "linux":
-        return RpiCamera(size=(IMAGE_WIDTH, IMAGE_HEIGHT))
-    else:
+class CameraFactory:
+    @staticmethod
+    def get_camera():
+        if sys.platform == "linux":
+            return RpiCamera(size=(IMAGE_WIDTH, IMAGE_HEIGHT))
         return CvCamera(size=(IMAGE_WIDTH, IMAGE_HEIGHT))
 
 
 if __name__ == "__main__":
-    camera = get_camera()    
+    camera = CameraFactory.get_camera()    
     generator = camera.capture()
     while True:
         frame = next(generator)

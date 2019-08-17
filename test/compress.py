@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 import unittest
 import zlib
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 import cv2
 import numpy as np

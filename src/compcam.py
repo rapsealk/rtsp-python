@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 import cv2
 import numpy as np
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 import zlib
 
 IMAGE_WIDTH = 1280
